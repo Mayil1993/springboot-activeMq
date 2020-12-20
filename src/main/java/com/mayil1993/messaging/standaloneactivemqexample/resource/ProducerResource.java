@@ -1,11 +1,17 @@
 package com.mayil1993.messaging.standaloneactivemqexample.resource;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jms.JmsException;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import javax.jms.Queue;
 
@@ -18,12 +24,14 @@ public class ProducerResource {
 
     @Autowired
     Queue queue;
+    
+    
 
-    @GetMapping("/{message}")
-    public String publish(@PathVariable("message")
-                          final String message) {
+    @PostMapping("/post")
+    public String publish(@RequestBody User user) throws JmsException, JsonProcessingException {
 
-        jmsTemplate.convertAndSend(queue, message);
+    	ObjectMapper ob = new ObjectMapper();
+        jmsTemplate.convertAndSend(queue, ob.writeValueAsString(user));
 
         return "Published Successfully";
     }
